@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>legislation.gov.bl — Legislation of the Blue Republic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0B1F3A;
+    --navy-deep:#081527;
+    --white:#FFFFFF;
+    --pale:#F3F5F8;
+    --panel:#F7F8FA;
+    --accent:#1D4E89;
+    --accent-dark:#123458;
+    --ink:#14181F;
+    --ink-soft:#4A5361;
+    --border:#D8DCE1;
+    --border-strong:#BCC3CC;
+
+    --status-active-bg:#E6EEF7; --status-active-fg:#1D4E89;
+    --status-passed-bg:#E5F0E7; --status-passed-fg:#1B5E3A;
+    --status-neutral-bg:#EDEEF0; --status-neutral-fg:#5B6472;
+    --status-pending-bg:#FBF0DC; --status-pending-fg:#7A560C;
+    --status-repealed-bg:#E7E7E8; --status-repealed-fg:#2B2B2B;
+    --status-amended-bg:#EEE7F2; --status-amended-fg:#5C3D77;
+    --danger:#A13A32; --danger-bg:#F7E9E7;
+
+    --serif:'Source Serif 4', Georgia, serif;
+    --sans:'Inter', Arial, sans-serif;
+    --mono:'IBM Plex Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--white);color:var(--ink);font-family:var(--sans);}
+  body{-webkit-font-smoothing:antialiased;}
+  a{color:var(--accent);text-decoration:none;}
+  a:hover{text-decoration:underline;}
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible{outline:3px solid #FFC53D;outline-offset:2px;}
+  .skip-link{position:absolute;left:-9999px;top:0;background:var(--navy);color:#fff;padding:10px 16px;z-index:100;}
+  .skip-link:focus{left:8px;top:8px;}
+
+  header.masthead{background:var(--navy);color:#fff;}
+  .masthead-inner{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:16px 24px;}
+  .wordmark{font-family:var(--serif);font-size:19px;font-weight:600;letter-spacing:0.2px;}
+  .wordmark small{display:block;font-family:var(--sans);font-weight:400;font-size:11px;color:#AFC1D6;letter-spacing:0.6px;text-transform:uppercase;margin-top:1px;}
+  .masthead-search{margin-left:auto;display:flex;align-items:center;gap:10px;}
+  .masthead-search input{width:200px;height:34px;border-radius:3px;border:1px solid #2C4568;background:#132A48;color:#fff;padding:0 10px;font-family:var(--sans);font-size:13px;}
+  .masthead-search input::placeholder{color:#7E93AC;}
+  .masthead-search button{height:34px;padding:0 12px;border-radius:3px;border:1px solid #2C4568;background:#16385E;color:#fff;font-size:13px;cursor:pointer;}
+  .admin-link{font-size:12px;color:#9FB6D1;white-space:nowrap;}
+  .admin-link:hover{color:#fff;}
+
+  nav.primarynav{background:var(--navy-deep);border-top:1px solid #16283F;}
+  .primarynav-inner{max-width:1180px;margin:0 auto;display:flex;gap:2px;padding:0 24px;overflow-x:auto;}
+  .primarynav-inner button{background:none;border:none;color:#CBD8E7;font-family:var(--sans);font-size:14px;padding:12px 14px;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;}
+  .primarynav-inner button:hover{color:#fff;}
+  .primarynav-inner button.active{color:#fff;border-bottom-color:#FFC53D;font-weight:500;}
+
+  main{max-width:1180px;margin:0 auto;padding:0 24px 64px;}
+  .view{display:none;}
+  .view.active{display:block;}
+
+  .hero{background:var(--pale);border:1px solid var(--border);margin-top:28px;padding:44px 40px;text-align:center;}
+  .hero h1{font-family:var(--serif);font-weight:600;font-size:32px;margin:0 0 8px;color:var(--ink);}
+  .hero p{margin:0 0 22px;color:var(--ink-soft);font-size:15px;}
+  .hero-search{max-width:620px;margin:0 auto;display:flex;}
+  .hero-search input{flex:1;height:48px;border:1px solid var(--border-strong);border-right:none;padding:0 16px;font-size:15px;font-family:var(--sans);}
+  .hero-search button{height:48px;padding:0 22px;background:var(--accent);color:#fff;border:1px solid var(--accent);font-size:15px;cursor:pointer;}
+  .hero-search button:hover{background:var(--accent-dark);}
+
+  .browse-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px;}
+  .browse-card{border:1px solid var(--border);background:var(--white);padding:22px 20px;text-align:left;cursor:pointer;font-family:var(--sans);}
+  .browse-card:hover{border-color:var(--accent);background:var(--pale);}
+  .browse-card .ic{width:30px;height:30px;margin-bottom:14px;color:var(--accent);}
+  .browse-card h3{font-size:16px;margin:0 0 4px;color:var(--ink);font-weight:600;}
+  .browse-card p{font-size:13px;color:var(--ink-soft);margin:0;}
+
+  .section-heading{display:flex;align-items:baseline;justify-content:space-between;margin:44px 0 12px;border-bottom:1px solid var(--border);padding-bottom:8px;}
+  .section-heading h2{font-family:var(--serif);font-size:20px;font-weight:600;margin:0;}
+  .section-heading a{font-size:13px;}
+  .page-title{margin-top:30px;}
+  .page-title h1{font-family:var(--serif);font-size:26px;font-weight:600;margin:0 0 6px;}
+  .page-title p{color:var(--ink-soft);font-size:14px;margin:0 0 20px;}
+
+  .activity-row{display:flex;align-items:center;gap:16px;padding:16px 0;border-bottom:1px solid var(--border);}
+  .activity-row:first-child{border-top:1px solid var(--border);}
+  .type-tag{flex:none;font-family:var(--mono);font-size:10px;letter-spacing:0.4px;text-transform:uppercase;color:var(--ink-soft);border:1px solid var(--border-strong);padding:3px 7px;width:76px;text-align:center;}
+  .activity-main{flex:1;min-width:0;}
+  .activity-main a{font-size:15px;color:var(--ink);font-weight:500;}
+  .activity-main a:hover{color:var(--accent);}
+  .activity-meta{font-size:12px;color:var(--ink-soft);margin-top:2px;}
+  .vote-bar-wrap{flex:none;width:150px;}
+  .status-pill{flex:none;font-size:12px;font-weight:500;padding:4px 10px;border-radius:11px;white-space:nowrap;}
+
+  .votebar{display:flex;height:10px;width:100%;border:1px solid var(--border-strong);overflow:hidden;}
+  .votebar span{height:100%;}
+  .vb-for{background:#4E8F5F;}
+  .vb-against{background:#C0524B;}
+  .vb-abstain{background:#D8C77A;}
+  .vb-absent{background:repeating-linear-gradient(135deg,#E4E6E9,#E4E6E9 3px,#F4F5F7 3px,#F4F5F7 6px);}
+  .votebar-legend{display:flex;gap:10px;font-size:11px;color:var(--ink-soft);margin-top:6px;flex-wrap:wrap;}
+  .votebar-legend span{display:inline-flex;align-items:center;gap:4px;}
+  .votebar-legend i{width:9px;height:9px;display:inline-block;border:1px solid var(--border-strong);}
+
+  footer{background:var(--pale);border-top:1px solid var(--border);margin-top:56px;}
+  .footer-inner{max-width:1180px;margin:0 auto;padding:26px 24px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+  .footer-inner nav a{font-size:13px;color:var(--ink-soft);margin-right:18px;}
+  .footer-copy{font-size:12px;color:var(--ink-soft);}
+
+  .browse-layout{display:grid;grid-template-columns:220px 1fr;gap:28px;margin-top:10px;}
+  .filters h4{font-size:12px;text-transform:uppercase;letter-spacing:0.5px;color:var(--ink-soft);margin:20px 0 8px;}
+  .filters h4:first-child{margin-top:0;}
+  .filters label{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--ink);padding:4px 0;}
+  .filters select{width:100%;height:32px;border:1px solid var(--border-strong);font-size:13px;font-family:var(--sans);}
+  .results-toolbar{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:4px;}
+  .results-toolbar p{font-size:13px;color:var(--ink-soft);margin:0;}
+  .result-card{border-bottom:1px solid var(--border);padding:18px 0;}
+  .result-top{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+  .ref{font-family:var(--mono);font-size:11px;color:var(--ink-soft);}
+  .result-card h3{font-family:var(--serif);font-size:18px;font-weight:600;margin:2px 0 6px;}
+  .result-card p.snippet{font-size:13px;color:var(--ink-soft);margin:0 0 8px;max-width:640px;}
+  .result-meta{font-size:12px;color:var(--ink-soft);}
+
+  .doc-header{margin-top:28px;}
+  .doc-eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .doc-header h1{font-family:var(--serif);font-size:30px;font-weight:600;margin:0 0 8px;}
+  .doc-refline{font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-bottom:16px;}
+  .meta-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--border);background:var(--panel);}
+  .meta-cell{padding:12px 16px;border-right:1px solid var(--border);}
+  .meta-cell:last-child{border-right:none;}
+  .meta-cell .k{font-size:11px;text-transform:uppercase;letter-spacing:0.4px;color:var(--ink-soft);margin-bottom:3px;}
+  .meta-cell .v{font-size:13px;color:var(--ink);font-weight:500;}
+
+  .doc-block{margin-top:36px;}
+  .doc-block h2{font-family:var(--serif);font-size:19px;font-weight:600;border-bottom:1px solid var(--border);padding-bottom:8px;margin:0 0 16px;}
+  .doc-block .summary{font-size:15px;line-height:1.6;color:var(--ink);max-width:760px;}
+  .legal-text{font-family:var(--serif);font-size:14px;line-height:1.8;color:var(--ink);background:var(--panel);border:1px solid var(--border);padding:22px 26px;max-width:760px;}
+  .legal-text p{margin:0 0 12px;}
+  .disclosure{font-size:13px;margin-top:10px;display:inline-block;}
+
+  .stepper{display:flex;justify-content:space-between;position:relative;margin:10px 0 4px;}
+  .stepper::before{content:'';position:absolute;top:8px;left:0;right:0;height:2px;background:var(--border);z-index:0;}
+  .step{position:relative;z-index:1;flex:1;text-align:center;}
+  .step .dot{width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid var(--border-strong);margin:0 auto 8px;}
+  .step.done .dot{background:var(--accent);border-color:var(--accent);}
+  .step .lbl{font-size:12px;color:var(--ink-soft);max-width:100px;margin:0 auto;}
+  .step.done .lbl{color:var(--ink);font-weight:500;}
+
+  .vote-result{display:flex;gap:36px;align-items:flex-start;flex-wrap:wrap;}
+  .vote-numbers{display:flex;gap:28px;}
+  .vote-numbers div{text-align:left;}
+  .vote-numbers .num{font-family:var(--serif);font-size:26px;font-weight:600;}
+  .vote-numbers .lbl{font-size:12px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:0.3px;}
+  .vote-visual{flex:1;min-width:260px;}
+
+  .related-list{list-style:none;padding:0;margin:0;}
+  .related-list li{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+  .related-list a{font-size:14px;font-weight:500;color:var(--ink);}
+  .related-list a:hover{color:var(--accent);}
+
+  .about-text{max-width:720px;font-size:15px;line-height:1.7;color:var(--ink);}
+  .about-text h3{font-family:var(--serif);font-size:17px;margin:28px 0 8px;}
+
+  .member-table{width:100%;border-collapse:collapse;margin-top:12px;}
+  .member-table th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.4px;color:var(--ink-soft);border-bottom:1px solid var(--border-strong);padding:8px 10px;}
+  .member-table td{padding:10px;border-bottom:1px solid var(--border);font-size:14px;}
+
+  .votes-table{width:100%;border-collapse:collapse;margin-top:12px;}
+  .votes-table th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.4px;color:var(--ink-soft);border-bottom:1px solid var(--border-strong);padding:8px 10px;}
+  .votes-table td{padding:12px 10px;border-bottom:1px solid var(--border);font-size:14px;vertical-align:middle;}
+  .votes-table .votebar{width:140px;}
+
+  /* ---- admin ---- */
+  .admin-shell{margin-top:26px;}
+  .admin-tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:24px;}
+  .admin-tabs button{background:none;border:none;font-family:var(--sans);font-size:14px;color:var(--ink-soft);padding:10px 16px;cursor:pointer;border-bottom:3px solid transparent;}
+  .admin-tabs button.active{color:var(--ink);font-weight:500;border-bottom-color:var(--accent);}
+  .admin-pane{display:none;}
+  .admin-pane.active{display:block;}
+  .admin-toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+  .btn{font-family:var(--sans);font-size:13px;padding:8px 14px;border:1px solid var(--border-strong);background:var(--white);cursor:pointer;}
+  .btn:hover{border-color:var(--accent);color:var(--accent);}
+  .btn-primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .btn-primary:hover{background:var(--accent-dark);color:#fff;}
+  .btn-danger{color:var(--danger);border-color:var(--danger-bg);}
+  .btn-danger:hover{background:var(--danger-bg);border-color:var(--danger);}
+  .admin-table{width:100%;border-collapse:collapse;}
+  .admin-table th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.4px;color:var(--ink-soft);border-bottom:1px solid var(--border-strong);padding:8px 10px;}
+  .admin-table td{padding:9px 10px;border-bottom:1px solid var(--border);font-size:13px;}
+  .row-actions{display:flex;gap:6px;}
+  .row-actions button{font-size:12px;padding:4px 9px;}
+
+  .form-panel{border:1px solid var(--border);background:var(--panel);padding:24px;margin-top:18px;display:none;}
+  .form-panel.active{display:block;}
+  .form-panel h3{font-family:var(--serif);font-size:18px;margin:0 0 18px;}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 18px;}
+  .field{display:flex;flex-direction:column;gap:5px;}
+  .field.full{grid-column:1 / -1;}
+  .field label{font-size:12px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:0.3px;}
+  .field input, .field select, .field textarea{font-family:var(--sans);font-size:14px;border:1px solid var(--border-strong);padding:8px 10px;background:#fff;}
+  .field textarea{font-family:var(--serif);resize:vertical;}
+  .form-section-title{font-size:12px;text-transform:uppercase;letter-spacing:0.4px;color:var(--ink-soft);margin:22px 0 10px;border-top:1px solid var(--border);padding-top:16px;}
+  .form-section-title:first-of-type{border-top:none;padding-top:0;margin-top:0;}
+  .result-preview{margin-top:12px;padding:10px 14px;background:#fff;border:1px solid var(--border-strong);font-size:13px;}
+  .result-preview strong{color:var(--accent);}
+  .form-actions{display:flex;gap:8px;margin-top:22px;justify-content:space-between;}
+  .form-actions .left{display:flex;gap:8px;}
+  .related-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+  .related-tags span{background:#fff;border:1px solid var(--border-strong);font-size:12px;padding:4px 8px;display:inline-flex;align-items:center;gap:6px;}
+  .related-tags span button{background:none;border:none;color:var(--ink-soft);cursor:pointer;font-size:12px;padding:0;}
+
+  @media (max-width:760px){
+    .browse-grid{grid-template-columns:1fr;}
+    .browse-layout{grid-template-columns:1fr;}
+    .meta-grid{grid-template-columns:repeat(2,1fr);}
+    .meta-cell:nth-child(2){border-right:none;}
+    .masthead-search input{width:120px;}
+    .form-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="wordmark">Legislation of the Blue Republic<small>legislation.gov.bl</small></div>
+    <div class="masthead-search">
+      <input type="text" placeholder="Search legislation, motions and votes" aria-label="Search">
+      <button type="button">Search</button>
+      <a class="admin-link" href="#" data-view="admin">Admin</a>
+    </div>
+  </div>
+  <nav class="primarynav">
+    <div class="primarynav-inner">
+      <button data-view="home" class="active">Home</button>
+      <button data-view="legislation">Legislation</button>
+      <button data-view="business">Parliamentary business</button>
+      <button data-view="votes">Votes</button>
+      <button data-view="members">Members</button>
+      <button data-view="about">About</button>
+    </div>
+  </nav>
+</header>
+
+<main id="main-content">
+
+  <!-- ============ HOME ============ -->
+  <section class="view active" id="view-home">
+    <div class="hero">
+      <h1>Legislation of the Blue Republic</h1>
+      <p>Search Acts, Bills, motions, resolutions and parliamentary votes.</p>
+      <div class="hero-search">
+        <input type="text" placeholder="Search legislation, motions and votes" aria-label="Search legislation, motions and votes">
+        <button type="button">Search</button>
+      </div>
+    </div>
+
+    <div class="browse-grid">
+      <button class="browse-card" data-view="legislation">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 3h9l4 4v14H6z" stroke="currentColor" stroke-width="1.6"/><path d="M9 12h7M9 16h7M9 8h3" stroke="currentColor" stroke-width="1.6"/></svg>
+        <h3>Browse legislation</h3>
+        <p>Acts, Bills, regulations and other instruments with legal force.</p>
+      </button>
+      <button class="browse-card" data-view="business">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="8" cy="9" r="3" stroke="currentColor" stroke-width="1.6"/><circle cx="17" cy="10" r="2.4" stroke="currentColor" stroke-width="1.6"/><path d="M3 20c0-3 2.5-5 5-5s5 2 5 5M14 20c0-2.2 1.8-4 4-4s4 1.8 4 4" stroke="currentColor" stroke-width="1.6"/></svg>
+        <h3>Browse parliamentary business</h3>
+        <p>Motions, resolutions, amendments and procedural proposals.</p>
+      </button>
+      <button class="browse-card" data-view="votes">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 20V10M11 20V4M18 20v-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <h3>Browse votes</h3>
+        <p>A chronological record of every division in Parliament.</p>
+      </button>
+    </div>
+
+    <div class="section-heading">
+      <h2>Recent activity</h2>
+      <a href="#" data-view="votes">View all activity</a>
+    </div>
+
+    <div class="activity-row">
+      <span class="type-tag">Bill</span>
+      <div class="activity-main">
+        <a href="#" data-view="doc">Coastal Fisheries Protection Bill</a>
+        <div class="activity-meta">BL-2026-021 · Introduced by the Ministry for Natural Resources</div>
+      </div>
+      <span class="status-pill" style="background:var(--status-active-bg);color:var(--status-active-fg);">Under debate</span>
+      <span class="activity-meta" style="flex:none;">3 Jul 2026</span>
+    </div>
+    <div class="activity-row">
+      <span class="type-tag">Motion</span>
+      <div class="activity-main">
+        <a href="#" data-view="doc">Motion on Regional Transport Funding</a>
+        <div class="activity-meta">MOT-2026-031 · Tabled by the Member for Harrow District</div>
+      </div>
+      <span class="status-pill" style="background:var(--status-passed-bg);color:var(--status-passed-fg);">Passed</span>
+      <span class="activity-meta" style="flex:none;">1 Jul 2026</span>
+    </div>
+    <div class="activity-row">
+      <span class="type-tag">Act</span>
+      <div class="activity-main">
+        <a href="#" data-view="doc">National Energy Security Act 2026</a>
+        <div class="activity-meta">ACT-2026-009 · 2026 c. 9 · Received presidential assent</div>
+      </div>
+      <span class="status-pill" style="background:var(--status-passed-bg);color:var(--status-passed-fg);">In force</span>
+      <span class="activity-meta" style="flex:none;">28 Jun 2026</span>
+    </div>
+    <div class="activity-row">
+      <span class="type-tag">Vote</span>
+      <div class="activity-main">
+        <a href="#" data-view="doc">Division on the National Energy Security Act</a>
+        <div class="activity-meta">Final vote · 25 seats total</div>
+      </div>
+      <div class="vote-bar-wrap">
+        <div class="votebar"><span class="vb-for" style="width:56%"></span><span class="vb-against" style="width:28%"></span><span class="vb-abstain" style="width:8%"></span><span class="vb-absent" style="width:8%"></span></div>
+      </div>
+      <span class="activity-meta" style="flex:none;">25 Jun 2026</span>
+    </div>
+  </section>
+
+  <!-- ============ LEGISLATION ============ -->
+  <section class="view" id="view-legislation">
+    <div class="page-title"><h1>Browse legislation</h1><p>Acts, Bills, regulations and other instruments with legal force.</p></div>
+    <div class="browse-layout">
+      <aside class="filters">
+        <h4>Document type</h4>
+        <label><input type="checkbox" checked> Acts</label>
+        <label><input type="checkbox" checked> Bills</label>
+        <label><input type="checkbox"> Regulations</label>
+        <label><input type="checkbox"> Orders</label>
+        <h4>Status</h4>
+        <select><option>Any status</option><option>In force</option><option>Under debate</option><option>Repealed</option></select>
+        <h4>Year</h4>
+        <select><option>Any year</option><option>2026</option><option>2025</option><option>2024</option></select>
+        <h4>Ministry</h4>
+        <select><option>Any ministry</option><option>Natural Resources</option><option>State Administration</option><option>Finance</option></select>
+      </aside>
+      <div class="results">
+        <div class="results-toolbar">
+          <p>14 results</p>
+          <select><option>Most recent</option><option>Oldest first</option><option>Alphabetical</option></select>
+        </div>
+        <div class="result-card">
+          <div class="result-top"><span class="ref">ACT-2026-009 · 2026 c. 9</span><span class="status-pill" style="background:var(--status-passed-bg);color:var(--status-passed-fg);">In force</span></div>
+          <h3><a href="#" data-view="doc">National Energy Security Act 2026</a></h3>
+          <p class="snippet">Establishes a national framework for energy supply resilience and creates the Office of Energy Security.</p>
+          <p class="result-meta">Sponsored by the Minister for State Administration · Assented 28 Jun 2026</p>
+        </div>
+        <div class="result-card">
+          <div class="result-top"><span class="ref">BL-2026-021</span><span class="status-pill" style="background:var(--status-active-bg);color:var(--status-active-fg);">Under debate</span></div>
+          <h3><a href="#" data-view="doc">Coastal Fisheries Protection Bill</a></h3>
+          <p class="snippet">Introduces licensing controls and seasonal quotas for coastal fishing fleets.</p>
+          <p class="result-meta">Sponsored by the Ministry for Natural Resources · Introduced 3 Jul 2026</p>
+        </div>
+        <div class="result-card">
+          <div class="result-top"><span class="ref">ACT-2024-002</span><span class="status-pill" style="background:var(--status-amended-bg);color:var(--status-amended-fg);">Amended</span></div>
+          <h3><a href="#" data-view="doc">Public Health Emergency Act 2024</a></h3>
+          <p class="snippet">Grants emergency powers to the Ministry of Health during declared public health emergencies.</p>
+          <p class="result-meta">Sponsored by the Minister for Health · Assented 14 Feb 2024</p>
+        </div>
+        <div class="result-card">
+          <div class="result-top"><span class="ref">ACT-2019-017</span><span class="status-pill" style="background:var(--status-repealed-bg);color:var(--status-repealed-fg);">Repealed</span></div>
+          <h3><a href="#" data-view="doc">Temporary Import Tariffs Act 2019</a></h3>
+          <p class="snippet">Set temporary tariff rates on imported machinery, later superseded by the Trade Modernisation Act.</p>
+          <p class="result-meta">Repealed by ACT-2023-011 · 9 Sep 2023</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PARLIAMENTARY BUSINESS ============ -->
+  <section class="view" id="view-business">
+    <div class="page-title"><h1>Browse parliamentary business</h1><p>Motions, resolutions, amendments and procedural proposals.</p></div>
+    <div class="browse-layout">
+      <aside class="filters">
+        <h4>Type</h4>
+        <label><input type="checkbox" checked> Motions</label>
+        <label><input type="checkbox" checked> Resolutions</label>
+        <label><input type="checkbox"> Amendments</label>
+        <h4>Result</h4>
+        <select><option>Any result</option><option>Passed</option><option>Rejected</option><option>Withdrawn</option></select>
+        <h4>Session</h4>
+        <select><option>Any session</option><option>2026 Spring</option><option>2025 Autumn</option></select>
+      </aside>
+      <div class="results">
+        <div class="results-toolbar"><p>8 results</p><select><option>Most recent</option><option>Oldest first</option></select></div>
+        <div class="result-card">
+          <div class="result-top"><span class="ref">MOT-2026-031</span><span class="status-pill" style="background:var(--status-passed-bg);color:var(--status-passed-fg);">Passed</span></div>
+          <h3><a href="#" data-view="doc">Motion on Regional Transport Funding</a></h3>
+          <p class="snippet">Calls on the Ministry of Transport to ring-fence additional funding for regional rail links.</p>
+          <p class="result-meta">Tabled by the Member for Harrow District · 1 Jul 2026</p>
+        </div>
+        <div class="result-card">
+          <div class="result-top"><span class="ref">RES-2026-007</span><span class="status-pill" style="background:var(--status-active-bg);color:var(--status-active-fg);">Under debate</span></div>
+          <h3><a href="#" data-view="doc">Resolution on Coastal Erosion Response</a></h3>
+          <p class="snippet">Recommends a joint task force between coastal ministries to address erosion at key sites.</p>
+          <p class="result-meta">Tabled by the Member for Southport · 20 Jun 2026</p>
+        </div>
+        <div class="result-card">
+          <div class="result-top"><span class="ref">MOT-2025-118</span><span class="status-pill" style="background:var(--status-neutral-bg);color:var(--status-neutral-fg);">Withdrawn</span></div>
+          <h3><a href="#" data-view="doc">Motion of Censure Against the Minister for Trade</a></h3>
+          <p class="snippet">Withdrawn ahead of debate following the minister's resignation.</p>
+          <p class="result-meta">Tabled by the Member for Eastbrook · 4 Nov 2025</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ VOTES ============ -->
+  <section class="view" id="view-votes">
+    <div class="page-title"><h1>Browse votes</h1><p>A chronological record of every division in Parliament.</p></div>
+    <div class="browse-layout">
+      <aside class="filters">
+        <h4>Outcome</h4>
+        <label><input type="checkbox" checked> Passed</label>
+        <label><input type="checkbox" checked> Rejected</label>
+        <h4>Vote type</h4>
+        <select><option>Any type</option><option>Final vote</option><option>Committee stage</option><option>Confidence vote</option></select>
+        <h4>Date</h4>
+        <select><option>Any time</option><option>Last 30 days</option><option>This session</option></select>
+      </aside>
+      <div class="results">
+        <table class="votes-table">
+          <thead><tr><th>Date</th><th>Item</th><th>Type</th><th>Result</th><th>Breakdown</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>25 Jun 2026</td>
+              <td><a href="#" data-view="doc">National Energy Security Act — final vote</a></td>
+              <td>Final vote</td>
+              <td><span class="status-pill" style="background:var(--status-passed-bg);color:var(--status-passed-fg);">Passed</span></td>
+              <td><div class="votebar"><span class="vb-for" style="width:56%"></span><span class="vb-against" style="width:28%"></span><span class="vb-abstain" style="width:8%"></span><span class="vb-absent" style="width:8%"></span></div></td>
+            </tr>
+            <tr>
+              <td>1 Jul 2026</td>
+              <td><a href="#" data-view="doc">Motion on Regional Transport Funding</a></td>
+              <td>Motion</td>
+              <td><span class="status-pill" style="background:var(--status-passed-bg);color:var(--status-passed-fg);">Passed</span></td>
+              <td><div class="votebar"><span class="vb-for" style="width:64%"></span><span class="vb-against" style="width:20%"></span><span class="vb-abstain" style="width:8%"></span><span class="vb-absent" style="width:8%"></span></div></td>
+            </tr>
+            <tr>
+              <td>14 Feb 2024</td>
+              <td><a href="#" data-view="doc">Public Health Emergency Act — committee stage</a></td>
+              <td>Committee stage</td>
+              <td><span class="status-pill" style="background:var(--status-repealed-bg);color:var(--status-repealed-fg);">Rejected</span></td>
+              <td><div class="votebar"><span class="vb-for" style="width:36%"></span><span class="vb-against" style="width:52%"></span><span class="vb-abstain" style="width:4%"></span><span class="vb-absent" style="width:8%"></span></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MEMBERS ============ -->
+  <section class="view" id="view-members">
+    <div class="page-title"><h1>Members</h1><p>How each member of Parliament voted on recent divisions.</p></div>
+    <table class="member-table">
+      <thead><tr><th>Member</th><th>Constituency</th><th>Affiliation</th><th>Votes recorded</th></tr></thead>
+      <tbody>
+        <tr><td>Member for Harrow District</td><td>Harrow District</td><td>Government</td><td>42</td></tr>
+        <tr><td>Member for Southport</td><td>Southport</td><td>Government</td><td>39</td></tr>
+        <tr><td>Member for Eastbrook</td><td>Eastbrook</td><td>Opposition</td><td>41</td></tr>
+        <tr><td>Member for Northgate</td><td>Northgate</td><td>Opposition</td><td>37</td></tr>
+        <tr><td>Member for Willowmere</td><td>Willowmere</td><td>Independent</td><td>40</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ============ ABOUT ============ -->
+  <section class="view" id="view-about">
+    <div class="page-title"><h1>About</h1><p>How legislation and parliamentary business move through Parliament.</p></div>
+    <div class="about-text">
+      <p>This site is a public record of legislation and parliamentary business in the Blue Republic. It publishes what Parliament has done and is doing — it is not the system Parliament itself uses to conduct its business.</p>
+      <h3>How a Bill becomes law</h3>
+      <p>A Bill is introduced, given a first reading, examined at committee stage, and put to a final vote. If it passes, it goes to the President for assent. Once assented, it commences either immediately or on a date set by order, and becomes an Act.</p>
+      <h3>Document statuses</h3>
+      <p>Bills move through statuses from Draft through to Enacted, Rejected or Withdrawn. Enacted laws are marked In force, Partially in force, Not yet in force, Amended, Suspended, Repealed or Expired, so it's always clear whether a law currently has effect.</p>
+      <h3>Parliamentary business</h3>
+      <p>Motions and resolutions follow a simpler path: Tabled, Scheduled, Under debate, and then Passed, Rejected, Withdrawn or Superseded.</p>
+    </div>
+  </section>
+
+  <!-- ============ DOCUMENT ============ -->
+  <section class="view" id="view-doc">
+    <div class="doc-header">
+      <div class="doc-eyebrow">
+        <span class="type-tag" style="width:auto;padding:3px 9px;">Act</span>
+        <span class="status-pill" style="background:var(--status-passed-bg);color:var(--status-passed-fg);">In force</span>
+      </div>
+      <h1>National Energy Security Act 2026</h1>
+      <div class="doc-refline">ACT-2026-009 · Formal citation: 2026 c. 9</div>
+      <div class="meta-grid">
+        <div class="meta-cell"><div class="k">Date introduced</div><div class="v">12 Mar 2026</div></div>
+        <div class="meta-cell"><div class="k">Sponsor</div><div class="v">Minister for State Administration</div></div>
+        <div class="meta-cell"><div class="k">Responsible ministry</div><div class="v">State Administration</div></div>
+        <div class="meta-cell"><div class="k">Presidential assent</div><div class="v">28 Jun 2026</div></div>
+      </div>
+    </div>
+
+    <div class="doc-block">
+      <h2>Summary</h2>
+      <p class="summary">This Act establishes a national framework for securing the Blue Republic's energy supply, creates the Office of Energy Security to monitor reserves and infrastructure, and sets out emergency powers the government may use during a declared supply shortage.</p>
+    </div>
+
+    <div class="doc-block">
+      <h2>Document text</h2>
+      <div class="legal-text">
+        <p><strong>Part 1 — Preliminary</strong><br>1. This Act may be cited as the National Energy Security Act 2026.<br>2. This Act comes into force on the date of presidential assent, save for Part 3, which comes into force on a date appointed by order.</p>
+        <p><strong>Part 2 — Office of Energy Security</strong><br>3. There is established an Office of Energy Security, responsible for monitoring national energy reserves and reporting annually to Parliament.</p>
+      </div>
+      <a class="disclosure" href="#">Read the full text of this Act</a>
+    </div>
+
+    <div class="doc-block">
+      <h2>Progress</h2>
+      <div class="stepper">
+        <div class="step done"><div class="dot"></div><div class="lbl">Introduced</div></div>
+        <div class="step done"><div class="dot"></div><div class="lbl">First reading</div></div>
+        <div class="step done"><div class="dot"></div><div class="lbl">Committee</div></div>
+        <div class="step done"><div class="dot"></div><div class="lbl">Final vote</div></div>
+        <div class="step done"><div class="dot"></div><div class="lbl">Presidential assent</div></div>
+        <div class="step"><div class="dot"></div><div class="lbl">Commencement</div></div>
+      </div>
+    </div>
+
+    <div class="doc-block">
+      <h2>Vote result</h2>
+      <div class="vote-result">
+        <div class="vote-numbers">
+          <div><div class="num">14</div><div class="lbl">For</div></div>
+          <div><div class="num">7</div><div class="lbl">Against</div></div>
+          <div><div class="num">2</div><div class="lbl">Abstained</div></div>
+          <div><div class="num">2</div><div class="lbl">Absent</div></div>
+        </div>
+        <div class="vote-visual">
+          <div class="votebar"><span class="vb-for" style="width:56%"></span><span class="vb-against" style="width:28%"></span><span class="vb-abstain" style="width:8%"></span><span class="vb-absent" style="width:8%"></span></div>
+          <div class="votebar-legend">
+            <span><i style="background:#4E8F5F;"></i>For</span>
+            <span><i style="background:#C0524B;"></i>Against</span>
+            <span><i style="background:#D8C77A;"></i>Abstained</span>
+            <span><i class="vb-absent"></i>Absent</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="doc-block">
+      <h2>Related documents</h2>
+      <ul class="related-list">
+        <li><span class="type-tag" style="width:auto;padding:2px 7px;">Reg</span><a href="#" data-view="doc">Energy Reserves (Reporting) Regulations 2026</a></li>
+        <li><span class="type-tag" style="width:auto;padding:2px 7px;">Motion</span><a href="#" data-view="doc">Motion to expedite Third Reading</a></li>
+        <li><span class="type-tag" style="width:auto;padding:2px 7px;">Bill</span><a href="#" data-view="doc">National Energy Security Bill (earlier version)</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ ADMIN ============ -->
+  <section class="view" id="view-admin">
+    <div class="page-title"><h1>Admin</h1><p>Create and edit published documents and members. This panel is a working interface only — connect it to your Cloudflare backend to persist changes.</p></div>
+
+    <div class="admin-shell">
+      <div class="admin-tabs">
+        <button class="admin-tab-btn active" data-pane="docs">Documents</button>
+        <button class="admin-tab-btn" data-pane="members">Members</button>
+      </div>
+
+      <!-- DOCUMENTS PANE -->
+      <div class="admin-pane active" id="pane-docs">
+        <div class="admin-toolbar">
+          <p style="font-size:13px;color:var(--ink-soft);margin:0;">4 documents</p>
+          <button class="btn btn-primary" id="new-doc-btn">+ New document</button>
+        </div>
+        <table class="admin-table" id="docs-table">
+          <thead><tr><th>Reference</th><th>Title</th><th>Type</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            <tr data-row="1">
+              <td class="ref">ACT-2026-009</td><td>National Energy Security Act 2026</td><td>Act</td>
+              <td><span class="status-pill" style="background:var(--status-passed-bg);color:var(--status-passed-fg);">In force</span></td>
+              <td class="row-actions"><button class="btn edit-doc-btn">Edit</button><button class="btn btn-danger delete-row-btn">Delete</button></td>
+            </tr>
+            <tr data-row="2">
+              <td class="ref">BL-2026-021</td><td>Coastal Fisheries Protection Bill</td><td>Bill</td>
+              <td><span class="status-pill" style="background:var(--status-active-bg);color:var(--status-active-fg);">Under debate</span></td>
+              <td class="row-actions"><button class="btn edit-doc-btn">Edit</button><button class="btn btn-danger delete-row-btn">Delete</button></td>
+            </tr>
+            <tr data-row="3">
+              <td class="ref">MOT-2026-031</td><td>Motion on Regional Transport Funding</td><td>Motion</td>
+              <td><span class="status-pill" style="background:var(--status-passed-bg);color:var(--status-passed-fg);">Passed</span></td>
+              <td class="row-actions"><button class="btn edit-doc-btn">Edit</button><button class="btn btn-danger delete-row-btn">Delete</button></td>
+            </tr>
+            <tr data-row="4">
+              <td class="ref">ACT-2019-017</td><td>Temporary Import Tariffs Act 2019</td><td>Act</td>
+              <td><span class="status-pill" style="background:var(--status-repealed-bg);color:var(--status-repealed-fg);">Repealed</span></td>
+              <td class="row-actions"><button class="btn edit-doc-btn">Edit</button><button class="btn btn-danger delete-row-btn">Delete</button></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="form-panel" id="doc-form-panel">
+          <h3 id="doc-form-title">New document</h3>
+
+          <div class="form-section-title">Basic details</div>
+          <div class="form-grid">
+            <div class="field"><label>Title</label><input type="text" placeholder="National Energy Security Act 2026"></div>
+            <div class="field"><label>Reference number</label><input type="text" placeholder="ACT-2026-009"></div>
+            <div class="field"><label>Formal citation</label><input type="text" placeholder="2026 c. 9"></div>
+            <div class="field"><label>Document type</label>
+              <select><option>Act</option><option>Bill</option><option>Regulation</option><option>Order</option><option>Emergency order</option><option>Constitutional amendment</option><option>Budget act</option><option>Treaty approval act</option><option>Motion</option><option>Resolution</option><option>Amendment</option><option>Confidence motion</option><option>Censure motion</option><option>Procedural motion</option><option>Committee report</option><option>Government statement</option><option>Petition</option></select>
+            </div>
+            <div class="field"><label>Status</label>
+              <select><option>Draft</option><option>Introduced</option><option>First reading</option><option>Under debate</option><option>Committee stage</option><option>Amended</option><option>Awaiting final vote</option><option>Passed Parliament</option><option>Rejected</option><option>Withdrawn</option><option>Awaiting presidential assent</option><option selected>Enacted</option><option>Vetoed</option><option>Repealed</option><option>Expired</option></select>
+            </div>
+            <div class="field"><label>Date introduced</label><input type="date" value="2026-03-12"></div>
+            <div class="field"><label>Sponsor</label><input type="text" placeholder="Minister for State Administration"></div>
+            <div class="field"><label>Responsible ministry</label><input type="text" placeholder="State Administration"></div>
+            <div class="field full"><label>Summary</label><textarea rows="3" placeholder="Short plain-English description"></textarea></div>
+            <div class="field full"><label>Full text</label><textarea rows="6" placeholder="Full legal or parliamentary text"></textarea></div>
+            <div class="field full"><label>Upload PDF</label><input type="file" accept="application/pdf"></div>
+          </div>
+
+          <div class="form-section-title">Progress stages</div>
+          <div class="form-grid">
+            <div class="field"><label>Add stage</label><input type="text" placeholder="e.g. Committee stage" id="stage-input"></div>
+            <div class="field"><label>Stage date</label><input type="date"></div>
+          </div>
+          <div class="related-tags" id="stage-tags">
+            <span>Introduced <button>×</button></span>
+            <span>First reading <button>×</button></span>
+            <span>Committee <button>×</button></span>
+            <span>Final vote <button>×</button></span>
+            <span>Presidential assent <button>×</button></span>
+          </div>
+
+          <div class="form-section-title">Vote entry</div>
+          <div class="form-grid">
+            <div class="field"><label>Votes for</label><input type="number" min="0" value="14" id="v-for"></div>
+            <div class="field"><label>Votes against</label><input type="number" min="0" value="7" id="v-against"></div>
+            <div class="field"><label>Abstentions</label><input type="number" min="0" value="2" id="v-abstain"></div>
+            <div class="field"><label>Absent</label><input type="number" min="0" value="2" id="v-absent"></div>
+            <div class="field"><label>Total seats</label><input type="number" min="0" value="25" id="v-total"></div>
+            <div class="field"><label>Vote date</label><input type="date"></div>
+            <div class="field"><label>Required majority</label>
+              <select id="v-majority">
+                <option value="simple">Simple majority (more for than against)</option>
+                <option value="absolute">Absolute majority (over half of all seats)</option>
+                <option value="twothirds">Two-thirds majority of votes cast</option>
+              </select>
+            </div>
+            <div class="field"><label>Tie-breaking vote used</label>
+              <select><option>No</option><option>Yes</option></select>
+            </div>
+            <div class="field full"><label>Notes</label><textarea rows="2" placeholder="Any unusual constitutional circumstances"></textarea></div>
+            <div class="field"><label>Override calculated result</label>
+              <select id="v-override"><option value="">No override — use calculated result</option><option value="passed">Passed</option><option value="rejected">Rejected</option><option value="tied">Tied</option></select>
+            </div>
+          </div>
+          <div class="result-preview" id="result-preview">Calculated result: <strong>Passed</strong></div>
+
+          <div class="form-section-title">Related documents</div>
+          <div class="form-grid">
+            <div class="field full"><label>Link a related document</label><input type="text" placeholder="Search by title or reference number"></div>
+          </div>
+          <div class="related-tags">
+            <span>Energy Reserves (Reporting) Regulations 2026 <button>×</button></span>
+            <span>Motion to expedite Third Reading <button>×</button></span>
+          </div>
+
+          <div class="form-actions">
+            <div class="left">
+              <button class="btn" id="cancel-doc-btn">Cancel</button>
+              <button class="btn btn-danger" id="delete-doc-btn">Delete document</button>
+            </div>
+            <div>
+              <button class="btn" id="save-draft-btn">Save as draft</button>
+              <button class="btn btn-primary" id="publish-btn">Publish</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MEMBERS PANE -->
+      <div class="admin-pane" id="pane-members">
+        <div class="admin-toolbar">
+          <p style="font-size:13px;color:var(--ink-soft);margin:0;">5 members</p>
+          <button class="btn btn-primary" id="new-member-btn">+ New member</button>
+        </div>
+        <table class="admin-table" id="members-table">
+          <thead><tr><th>Member</th><th>Constituency</th><th>Affiliation</th><th></th></tr></thead>
+          <tbody>
+            <tr><td>Member for Harrow District</td><td>Harrow District</td><td>Government</td><td class="row-actions"><button class="btn edit-member-btn">Edit</button><button class="btn btn-danger delete-row-btn">Delete</button></td></tr>
+            <tr><td>Member for Southport</td><td>Southport</td><td>Government</td><td class="row-actions"><button class="btn edit-member-btn">Edit</button><button class="btn btn-danger delete-row-btn">Delete</button></td></tr>
+            <tr><td>Member for Eastbrook</td><td>Eastbrook</td><td>Opposition</td><td class="row-actions"><button class="btn edit-member-btn">Edit</button><button class="btn btn-danger delete-row-btn">Delete</button></td></tr>
+            <tr><td>Member for Northgate</td><td>Northgate</td><td>Opposition</td><td class="row-actions"><button class="btn edit-member-btn">Edit</button><button class="btn btn-danger delete-row-btn">Delete</button></td></tr>
+            <tr><td>Member for Willowmere</td><td>Willowmere</td><td>Independent</td><td class="row-actions"><button class="btn edit-member-btn">Edit</button><button class="btn btn-danger delete-row-btn">Delete</button></td></tr>
+          </tbody>
+        </table>
+
+        <div class="form-panel" id="member-form-panel">
+          <h3 id="member-form-title">New member</h3>
+          <div class="form-grid">
+            <div class="field"><label>Name or title</label><input type="text" placeholder="Member for Harrow District"></div>
+            <div class="field"><label>Constituency</label><input type="text" placeholder="Harrow District"></div>
+            <div class="field"><label>Affiliation</label>
+              <select><option>Government</option><option>Opposition</option><option>Independent</option></select>
+            </div>
+          </div>
+          <div class="form-actions">
+            <div class="left">
+              <button class="btn" id="cancel-member-btn">Cancel</button>
+              <button class="btn btn-danger" id="delete-member-btn">Delete member</button>
+            </div>
+            <div><button class="btn btn-primary" id="save-member-btn">Save</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <nav>
+      <a href="#">Government of the Blue Republic</a>
+      <a href="#">Parliament</a>
+      <a href="#">Accessibility</a>
+      <a href="#">Copyright</a>
+      <a href="#">Contact</a>
+    </nav>
+    <div class="footer-copy">© Government of the Blue Republic</div>
+  </div>
+</footer>
+
+<script>
+  function showView(target){
+    document.querySelectorAll('.view').forEach(function(v){ v.classList.remove('active'); });
+    document.getElementById('view-' + target).classList.add('active');
+    document.querySelectorAll('.primarynav-inner button').forEach(function(b){ b.classList.remove('active'); });
+    var navBtn = document.querySelector('.primarynav-inner button[data-view="' + target + '"]');
+    if(navBtn) navBtn.classList.add('active');
+    window.scrollTo({top:0, behavior:'instant'});
+  }
+  document.querySelectorAll('[data-view]').forEach(function(el){
+    el.addEventListener('click', function(e){
+      e.preventDefault();
+      showView(el.getAttribute('data-view'));
+    });
+  });
+
+  // admin tab switching
+  document.querySelectorAll('.admin-tab-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.admin-tab-btn').forEach(function(b){ b.classList.remove('active'); });
+      document.querySelectorAll('.admin-pane').forEach(function(p){ p.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById('pane-' + btn.getAttribute('data-pane')).classList.add('active');
+    });
+  });
+
+  // doc form open/close
+  var docPanel = document.getElementById('doc-form-panel');
+  document.getElementById('new-doc-btn').addEventListener('click', function(){
+    document.getElementById('doc-form-title').textContent = 'New document';
+    docPanel.classList.add('active');
+    docPanel.scrollIntoView({behavior:'smooth', block:'nearest'});
+  });
+  document.querySelectorAll('.edit-doc-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var title = btn.closest('tr').children[1].textContent;
+      document.getElementById('doc-form-title').textContent = 'Edit — ' + title;
+      docPanel.classList.add('active');
+      docPanel.scrollIntoView({behavior:'smooth', block:'nearest'});
+    });
+  });
+  document.getElementById('cancel-doc-btn').addEventListener('click', function(){ docPanel.classList.remove('active'); });
+  document.getElementById('save-draft-btn').addEventListener('click', function(){ docPanel.classList.remove('active'); });
+  document.getElementById('publish-btn').addEventListener('click', function(){ docPanel.classList.remove('active'); });
+  document.getElementById('delete-doc-btn').addEventListener('click', function(){
+    if(confirm('Delete this document? This cannot be undone once connected to your live data.')) docPanel.classList.remove('active');
+  });
+
+  // member form open/close
+  var memberPanel = document.getElementById('member-form-panel');
+  document.getElementById('new-member-btn').addEventListener('click', function(){
+    document.getElementById('member-form-title').textContent = 'New member';
+    memberPanel.classList.add('active');
+    memberPanel.scrollIntoView({behavior:'smooth', block:'nearest'});
+  });
+  document.querySelectorAll('.edit-member-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var name = btn.closest('tr').children[0].textContent;
+      document.getElementById('member-form-title').textContent = 'Edit — ' + name;
+      memberPanel.classList.add('active');
+      memberPanel.scrollIntoView({behavior:'smooth', block:'nearest'});
+    });
+  });
+  document.getElementById('cancel-member-btn').addEventListener('click', function(){ memberPanel.classList.remove('active'); });
+  document.getElementById('save-member-btn').addEventListener('click', function(){ memberPanel.classList.remove('active'); });
+  document.getElementById('delete-member-btn').addEventListener('click', function(){
+    if(confirm('Delete this member?')) memberPanel.classList.remove('active');
+  });
+
+  // delete row directly from table
+  document.querySelectorAll('.delete-row-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var row = btn.closest('tr');
+      var label = row.children[1] ? row.children[1].textContent : row.children[0].textContent;
+      if(confirm('Delete "' + label + '"? This removes it from the published site.')){
+        row.remove();
+      }
+    });
+  });
+
+  // live vote result calculation
+  function calcResult(){
+    var f = parseInt(document.getElementById('v-for').value) || 0;
+    var a = parseInt(document.getElementById('v-against').value) || 0;
+    var ab = parseInt(document.getElementById('v-abstain').value) || 0;
+    var ax = parseInt(document.getElementById('v-absent').value) || 0;
+    var total = parseInt(document.getElementById('v-total').value) || (f+a+ab+ax);
+    var majority = document.getElementById('v-majority').value;
+    var override = document.getElementById('v-override').value;
+    var result;
+    if(override){
+      result = override.charAt(0).toUpperCase() + override.slice(1) + ' (overridden)';
+    } else if(majority === 'absolute'){
+      result = f > total/2 ? 'Passed with required majority' : 'Failed to reach required majority';
+    } else if(majority === 'twothirds'){
+      var cast = f + a;
+      result = cast > 0 && f >= (2/3)*cast ? 'Passed with required majority' : 'Failed to reach required majority';
+    } else {
+      result = f > a ? 'Passed' : (f === a ? 'Tied' : 'Rejected');
+    }
+    document.getElementById('result-preview').innerHTML = 'Calculated result: <strong>' + result + '</strong>';
+  }
+  ['v-for','v-against','v-abstain','v-absent','v-total','v-majority','v-override'].forEach(function(id){
+    var el = document.getElementById(id);
+    el.addEventListener('input', calcResult);
+    el.addEventListener('change', calcResult);
+  });
+  calcResult();
+</script>
+</body>
+</html>
